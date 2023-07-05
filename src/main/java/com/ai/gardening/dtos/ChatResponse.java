@@ -1,18 +1,16 @@
 package com.ai.gardening.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ChatResponse {
+
     private List<Choice> choices;
+
 
     public static class Choice {
 
@@ -22,6 +20,9 @@ public class ChatResponse {
         public Choice(int index, MessageRequest message) {
             this.index = index;
             this.message = message;
+        }
+
+        public Choice() {
         }
 
         public int getIndex() {
@@ -41,3 +42,4 @@ public class ChatResponse {
         }
     }
 }
+
