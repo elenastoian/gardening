@@ -24,17 +24,15 @@ public class ChatController {
 
     @GetMapping("/chat")
     public String chat(@RequestParam String prompt) {
-        // create a request
+
         ChatRequest request = new ChatRequest(model, prompt);
 
-        // call the API
         ChatResponse response = restTemplate.postForObject(apiUrl, request, ChatResponse.class);
 
         if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
             return "No response";
         }
 
-        // return the first response
         return response.getChoices().get(0).getMessage().getContent();
     }
 }

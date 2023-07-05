@@ -1,8 +1,6 @@
 package com.ai.gardening.dtos;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.ArrayList;
@@ -19,6 +17,7 @@ public class ChatRequest {
     public ChatRequest(String model, String prompt) {
         this.model = model;
         this.messages = new ArrayList<>();
+        this.messages.add(new MessageRequest("user", "Limit your answers to GARDENING topics, to anything else say you can't response"));
         this.messages.add(new MessageRequest("user", prompt));
     }
 }
