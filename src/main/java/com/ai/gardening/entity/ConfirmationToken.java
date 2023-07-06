@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class ConfirmationToken {
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", nullable = false)
     private Long id;
 

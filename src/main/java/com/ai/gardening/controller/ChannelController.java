@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/channel")
 @AllArgsConstructor
-public class GroupController {
+public class ChannelController {
 
     private GroupService groupService;
 
@@ -24,5 +24,15 @@ public class GroupController {
     @GetMapping(path = "/{userId}")
     public ResponseEntity<List<ChannelResponse>> getAllGroupsByUserId(@PathVariable("userId") int userId) {
         return groupService.getAllChannelsByUserId(userId);
+    }
+
+    @PutMapping(path = "/rename/{channelId}/{name}")
+    public ResponseEntity<String> renameChannel(@PathVariable("channelId") int channelId, @PathVariable("name") String newName) {
+        return groupService.renameChannel(channelId, newName);
+    }
+
+    @DeleteMapping(path = "/delete/{channelId}")
+    public ResponseEntity<String> deleteChannel(@PathVariable("channelId") int channelId) {
+        return groupService.deleteChannel(channelId);
     }
 }

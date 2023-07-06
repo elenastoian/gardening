@@ -46,10 +46,33 @@ public class GroupService {
         }
 
         List<ChannelResponse> responseList = new ArrayList<>();
-        groups.forEach(g ->{
-          responseList.add(new ChannelResponse(g.getName()));
-        });
+        groups.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
 
          return ResponseEntity.status(HttpStatus.OK).body(responseList);
+    }
+
+    public ResponseEntity<String> renameChannel(int channelId, String newName) {
+        Optional<Channel> channel = channelRepository.findById((long)channelId);
+
+        if (channel.isPresent()) {
+            channel.get().setName(newName);
+            channelRepository.save(channel.get());
+            LOGGER.info("The channel was renamed to {}", newName);
+            return ResponseEntity.status(HttpStatus.OK).body("The channel was renamed.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("The channel was not found.");
+    }
+
+    public ResponseEntity<String> deleteChannel(int channelId) {
+        Optional<Channel> channel = channelRepository.findById((long)channelId);
+
+        if (channel.isPresent()) {
+            channelRepository.delete(channel.get());
+            LOGGER.info("The channel with id {} was deleted", channelId);
+            return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("The channel was not deleted.");
     }
 }
