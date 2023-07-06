@@ -13,5 +13,5 @@ public interface ChannelRepository extends JpaRepository<Channel, Long> {
      @Query(value = "SELECT * FROM channel WHERE creator_id = ?1", nativeQuery = true)
      List<Channel> findAllByAppUserId(int userId);
 
-
+     Channel findByName(String channelName);
 }

@@ -27,14 +27,24 @@ public class GroupService {
 
     public ResponseEntity<String> createChannel(ChannelRequest channelRequest) {
         if (channelRequest == null)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The group that was sent is null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The channel that was sent is null.");
 
         Optional<AppUser> appUser = appUserRepository.findById(channelRequest.getCreatorId());
-        Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
-        channelRepository.save(newChannel);
-        LOGGER.info("A new group with name {} was saved.", newChannel.getName());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("The new group was created.");
+       if(findChannel(channelRequest.getName()) == null) {
+           Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
+           channelRepository.save(newChannel);
+
+           LOGGER.info("A new channel with name {} was saved.", newChannel.getName());
+           return ResponseEntity.status(HttpStatus.CREATED).body("The new channel was created.");
+       }
+
+        LOGGER.info("A new channel with name {} already exists.", channelRequest.getName());
+        return ResponseEntity.status(HttpStatus.OK).body("A channel with the same name already exists.");
+    }
+
+    public Channel findChannel(String channelName) {
+        return channelRepository.findByName(channelName);
     }
 
     public ResponseEntity<List<ChannelResponse>>  getAllChannelsByUserId(int userId) {
