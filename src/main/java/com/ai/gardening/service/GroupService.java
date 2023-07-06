@@ -7,6 +7,7 @@ import com.ai.gardening.entity.Channel;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.ChannelRepository;
 import lombok.AllArgsConstructor;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
 
 @Service
 @AllArgsConstructor
 public class GroupService {
-    //private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
     private ChannelRepository channelRepository;
     private AppUserRepository appUserRepository;
 
@@ -30,7 +32,7 @@ public class GroupService {
         Optional<AppUser> appUser = appUserRepository.findById(channelRequest.getCreatorId());
         Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
         channelRepository.save(newChannel);
-       // LOGGER.info("A new group with name {} was saved.", newGroup.getName());
+        LOGGER.info("A new group with name {} was saved.", newChannel.getName());
 
         return ResponseEntity.status(HttpStatus.CREATED).body("The new group was created.");
     }
@@ -38,8 +40,10 @@ public class GroupService {
     public ResponseEntity<List<ChannelResponse>>  getAllChannelsByUserId(int userId) {
         List<Channel> groups = channelRepository.findAllByAppUserId(userId);
 
-        if (groups.isEmpty())
+        if (groups.isEmpty()) {
+            LOGGER.info("No group was found for user {}", userId);
             return ResponseEntity.status(HttpStatus.OK).body(Collections.emptyList());
+        }
 
         List<ChannelResponse> responseList = new ArrayList<>();
         groups.forEach(g ->{
