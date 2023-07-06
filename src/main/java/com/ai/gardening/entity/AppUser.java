@@ -45,6 +45,9 @@ public class AppUser implements UserDetails {
     @NonNull
     private AppUserRole appUserRole;
 
+    @OneToMany(mappedBy="creator")
+    private List<Channel> channels;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(appUserRole.name()));
