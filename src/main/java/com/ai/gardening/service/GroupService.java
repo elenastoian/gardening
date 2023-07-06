@@ -51,8 +51,8 @@ public class GroupService {
          return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
-    public ResponseEntity<String> renameChannel(int channelId, String newName) {
-        Optional<Channel> channel = channelRepository.findById((long)channelId);
+    public ResponseEntity<String> renameChannel(long channelId, String newName) {
+        Optional<Channel> channel = channelRepository.findById(channelId);
 
         if (channel.isPresent()) {
             channel.get().setName(newName);
@@ -64,15 +64,19 @@ public class GroupService {
         return ResponseEntity.status(HttpStatus.OK).body("The channel was not found.");
     }
 
-    public ResponseEntity<String> deleteChannel(int channelId) {
-        Optional<Channel> channel = channelRepository.findById((long)channelId);
+    public ResponseEntity<String> deleteChannel(long channelId, long creatorId) {
+        Optional<Channel> channel = channelRepository.findById(channelId);
 
         if (channel.isPresent()) {
-            channelRepository.delete(channel.get());
-            LOGGER.info("The channel with id {} was deleted", channelId);
-            return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
-        }
 
-        return ResponseEntity.status(HttpStatus.OK).body("The channel was not deleted.");
+            if (channel.get().getCreator().getId().equals(creatorId)) {
+                channelRepository.delete(channel.get());
+                LOGGER.info("The channel with id {} was deleted", channelId);
+                return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Only the creator can delete the channel");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.OK).body("The channel does not exist.");
     }
 }

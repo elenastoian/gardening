@@ -27,12 +27,12 @@ public class ChannelController {
     }
 
     @PutMapping(path = "/rename/{channelId}/{name}")
-    public ResponseEntity<String> renameChannel(@PathVariable("channelId") int channelId, @PathVariable("name") String newName) {
+    public ResponseEntity<String> renameChannel(@PathVariable("channelId") long channelId, @PathVariable("name") String newName) {
         return groupService.renameChannel(channelId, newName);
     }
 
-    @DeleteMapping(path = "/delete/{channelId}")
-    public ResponseEntity<String> deleteChannel(@PathVariable("channelId") int channelId) {
-        return groupService.deleteChannel(channelId);
+    @DeleteMapping(path = "/delete/{channelId}/{creatorId}")
+    public ResponseEntity<String> deleteChannel(@PathVariable("channelId") long channelId, @PathVariable("creatorId") long creatorId) {
+        return groupService.deleteChannel(channelId, creatorId);
     }
 }
