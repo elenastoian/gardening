@@ -1,5 +1,6 @@
 package com.ai.gardening.dtos;
 
+import com.ai.gardening.entity.AppUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,5 +10,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ChannelRequest {
     private String name;
-    private int creatorId;
+    private long creatorId;
 }

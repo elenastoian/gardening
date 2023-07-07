@@ -1,7 +1,12 @@
 package com.ai.gardening.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Entity
 @Getter
@@ -21,13 +26,18 @@ public class Channel {
     @NonNull
     private boolean isBlocked;
 
-    @ManyToOne
-    @JoinColumn(name = "creator_id")
-    private AppUser creator;
+    @NonNull
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "admin")
+    private AppUser admin;
 
-    public Channel(String name, boolean isBlocked, AppUser creator) {
+    @ManyToMany(mappedBy = "channels")
+    private List<AppUser> users = new ArrayList<>() ;
+
+    public Channel(String name, boolean isBlocked, AppUser admin) {
         this.name = name;
         this.isBlocked = isBlocked;
-        this.creator = creator;
+        this.admin = admin;
     }
 }

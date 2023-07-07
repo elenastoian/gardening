@@ -12,10 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
+import java.util.*;
+
 import org.slf4j.Logger;
 
 @Service
@@ -29,15 +28,16 @@ public class GroupService {
         if (channelRequest == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The channel that was sent is null.");
 
-        Optional<AppUser> appUser = appUserRepository.findById(channelRequest.getCreatorId());
+        Optional<AppUser> appUser = appUserRepository.findById((int) channelRequest.getCreatorId());
 
        if(findChannel(channelRequest.getName()) == null) {
            Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
            channelRepository.save(newChannel);
+            addAppUserToChannel(appUser.get(), newChannel);
 
-           LOGGER.info("A new channel with name {} was saved.", newChannel.getName());
-           return ResponseEntity.status(HttpStatus.CREATED).body("The new channel was created.");
-       }
+            LOGGER.info("A new channel with name {} was saved.", newChannel.getName());
+            return ResponseEntity.status(HttpStatus.CREATED).body("The new channel was created.");
+        }
 
         LOGGER.info("A new channel with name {} already exists.", channelRequest.getName());
         return ResponseEntity.status(HttpStatus.OK).body("A channel with the same name already exists.");
@@ -47,7 +47,7 @@ public class GroupService {
         return channelRepository.findByName(channelName);
     }
 
-    public ResponseEntity<List<ChannelResponse>>  getAllChannelsByUserId(int userId) {
+    public ResponseEntity<List<ChannelResponse>> getAllChannelsByUserId(int userId) {
         List<Channel> groups = channelRepository.findAllByAppUserId(userId);
 
         if (groups.isEmpty()) {
@@ -58,7 +58,7 @@ public class GroupService {
         List<ChannelResponse> responseList = new ArrayList<>();
         groups.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
 
-         return ResponseEntity.status(HttpStatus.OK).body(responseList);
+        return ResponseEntity.status(HttpStatus.OK).body(responseList);
     }
 
     public ResponseEntity<String> renameChannel(long channelId, String newName) {
@@ -74,12 +74,13 @@ public class GroupService {
         return ResponseEntity.status(HttpStatus.OK).body("The channel was not found.");
     }
 
+    //TODO: find a better solution for authentication check
     public ResponseEntity<String> deleteChannel(long channelId, long creatorId) {
         Optional<Channel> channel = channelRepository.findById(channelId);
 
         if (channel.isPresent()) {
 
-            if (channel.get().getCreator().getId().equals(creatorId)) {
+            if (channel.get().getAdmin().getId().equals(creatorId)) {
                 channelRepository.delete(channel.get());
                 LOGGER.info("The channel with id {} was deleted", channelId);
                 return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
@@ -88,5 +89,18 @@ public class GroupService {
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body("The channel does not exist.");
+    }
+
+    public void addAppUserToChannel(AppUser appUser, Channel channel) {
+        try {
+            appUser.getChannels().add(channel);
+            channel.getUsers().add(appUser);
+
+            appUserRepository.save(appUser);
+            channelRepository.save(channel);
+        } catch (Exception e) {
+            LOGGER.error("Failed to add app user to channel");
+            throw e;
+        }
     }
 }
