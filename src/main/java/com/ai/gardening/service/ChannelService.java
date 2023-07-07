@@ -12,15 +12,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.slf4j.Logger;
 
 @Service
 @AllArgsConstructor
-public class GroupService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
+public class ChannelService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChannelService.class);
     private ChannelRepository channelRepository;
     private AppUserRepository appUserRepository;
 
@@ -28,11 +27,11 @@ public class GroupService {
         if (channelRequest == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The channel that was sent is null.");
 
-        Optional<AppUser> appUser = appUserRepository.findById((int) channelRequest.getCreatorId());
+        Optional<AppUser> appUser = appUserRepository.findById(channelRequest.getCreatorId());
 
-       if(findChannel(channelRequest.getName()) == null) {
-           Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
-           channelRepository.save(newChannel);
+        if (findChannel(channelRequest.getName()) == null) {
+            Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
+            channelRepository.save(newChannel);
             addAppUserToChannel(appUser.get(), newChannel);
 
             LOGGER.info("A new channel with name {} was saved.", newChannel.getName());
@@ -89,6 +88,18 @@ public class GroupService {
             }
         }
         return ResponseEntity.status(HttpStatus.OK).body("The channel does not exist.");
+    }
+
+    public ResponseEntity<String> joinChannel(long appUserId, long channelId) {
+        Optional<AppUser> appUser = appUserRepository.findById(appUserId); //TODO: make it a separate method in AppUserService
+        Optional<Channel> channel = channelRepository.findById(channelId); //TODO: make it a separate method
+
+        if (appUser.isPresent() && channel.isPresent()) {
+            addAppUserToChannel(appUser.get(), channel.get());
+            return ResponseEntity.status(HttpStatus.OK).body("New user has joined to the channel.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("User or channel was not found. No one could join.");
     }
 
     public void addAppUserToChannel(AppUser appUser, Channel channel) {
