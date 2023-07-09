@@ -35,6 +35,10 @@ public class Channel {
     @ManyToMany(mappedBy = "channels")
     private List<AppUser> users = new ArrayList<>() ;
 
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Post> posts = new ArrayList<>();
+
     public Channel(String name, boolean isBlocked, AppUser admin) {
         this.name = name;
         this.isBlocked = isBlocked;
