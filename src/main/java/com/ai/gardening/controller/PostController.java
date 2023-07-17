@@ -15,12 +15,12 @@ public class PostController {
     private PostService postService;
 
     @PostMapping(path = "/create")
-    public ResponseEntity<AddPostResponse> addPost(@RequestBody AddPostRequest addPostRequest) {
-        return postService.addPost(addPostRequest);
+    public ResponseEntity<AddPostResponse> addPost(@RequestBody AddPostRequest addPostRequest, @RequestHeader("Authorization") String token) {
+        return postService.addPost(addPostRequest, token);
     }
 
-    @DeleteMapping(path = "/delete")
-    public ResponseEntity<String> addPost(@RequestBody DeletePostRequest deletePostRequest) {
-        return postService.deletePost(deletePostRequest);
+    @DeleteMapping( path = "/delete/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable("postId")long postId, @RequestHeader("Authorization") String token) {
+        return postService.deletePost(postId, token);
     }
 }

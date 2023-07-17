@@ -7,8 +7,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class DeletePostRequest {
+@NoArgsConstructor
+public class EditPostRequest {
+    private String title;
+    private String description;
+    private long appUserId;
     private long postId;
 }

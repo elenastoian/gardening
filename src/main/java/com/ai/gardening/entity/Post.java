@@ -27,7 +27,7 @@ public class Post {
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin")
-    private AppUser admin;
+    @JoinColumn(name = "owner")
+    private AppUser owner;
 
 }

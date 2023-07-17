@@ -9,6 +9,5 @@ import lombok.*;
 public class AddPostRequest {
     private String title;
     private String description;
-    private long adminId;
     private long channelId;
 }

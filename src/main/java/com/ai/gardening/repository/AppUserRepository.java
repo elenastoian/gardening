@@ -19,4 +19,10 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Modifying
     @Query(value = "UPDATE AppUser a SET a.isEnabled = TRUE WHERE a.email = :email")
     int enableAppUser(@Param("email") String email);
+
+    @Query("SELECT au FROM AppUser au JOIN au.posts p WHERE p.id = :postId")
+    Optional<AppUser> findByPostId(@Param("postId") long postId);
+
+    @Query(value = "SELECT u FROM AppUser u JOIN u.tokens t WHERE t.token = :token")
+    Optional<AppUser> findByTokensToken(@Param("token") String token);
 }

@@ -79,7 +79,7 @@ public class ChannelService {
 
         if (channel.isPresent()) {
 
-            if (channel.get().getAdmin().getId().equals(creatorId)) {
+            if (channel.get().getOwner().getId().equals(creatorId)) {
                 channelRepository.delete(channel.get());
                 LOGGER.info("The channel with id {} was deleted", channelId);
                 return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -29,8 +28,8 @@ public class Channel {
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin")
-    private AppUser admin;
+    @JoinColumn(name = "owner")
+    private AppUser owner;
 
     @ManyToMany(mappedBy = "channels")
     private List<AppUser> users = new ArrayList<>() ;
@@ -39,9 +38,9 @@ public class Channel {
     @JsonIgnore
     private List<Post> posts = new ArrayList<>();
 
-    public Channel(String name, boolean isBlocked, AppUser admin) {
+    public Channel(String name, boolean isBlocked, AppUser owner) {
         this.name = name;
         this.isBlocked = isBlocked;
-        this.admin = admin;
+        this.owner = owner;
     }
 }

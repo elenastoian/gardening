@@ -2,17 +2,15 @@ package com.ai.gardening.entity;
 
 import com.ai.gardening.entity.enums.TokenType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "token")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class Token {
 
     @Id
@@ -30,6 +28,6 @@ public class Token {
     private boolean expired;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id" )
     private AppUser user;
 }
