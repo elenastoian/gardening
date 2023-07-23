@@ -29,7 +29,7 @@ public class ChannelService {
 
         Optional<AppUser> appUser = appUserRepository.findById(channelRequest.getCreatorId());
 
-        if (findChannel(channelRequest.getName()) == null) {
+        if (findChannelByName(channelRequest.getName()) == null) {
             Channel newChannel = new Channel(channelRequest.getName(), false, appUser.orElse(new AppUser())); //TODO: handle this exception
             channelRepository.save(newChannel);
             addAppUserToChannel(appUser.get(), newChannel);
@@ -40,10 +40,6 @@ public class ChannelService {
 
         LOGGER.info("A new channel with name {} already exists.", channelRequest.getName());
         return ResponseEntity.status(HttpStatus.OK).body("A channel with the same name already exists.");
-    }
-
-    public Channel findChannel(String channelName) {
-        return channelRepository.findByName(channelName);
     }
 
     public ResponseEntity<List<ChannelResponse>> getAllChannelsByUserId(int userId) {
@@ -70,10 +66,10 @@ public class ChannelService {
             return ResponseEntity.status(HttpStatus.OK).body("The channel was renamed.");
         }
 
-        return ResponseEntity.status(HttpStatus.OK).body("The channel was not found.");
+        LOGGER.info("The channel was not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The channel was not found.");
     }
 
-    //TODO: find a better solution for authentication check
     public ResponseEntity<String> deleteChannel(long channelId, long creatorId) {
         Optional<Channel> channel = channelRepository.findById(channelId);
 
@@ -113,5 +109,15 @@ public class ChannelService {
             LOGGER.error("Failed to add app user to channel");
             throw e;
         }
+    }
+
+    public Channel findChannelByName(String channelName) {
+        return channelRepository.findByName(channelName);
+    }
+
+    public Channel findChannelById(long channelId) {
+        Optional<Channel> channel= channelRepository.findById(channelId);
+
+        return channel.isPresent() ? channel.get() : new Channel();
     }
 }

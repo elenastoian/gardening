@@ -9,6 +9,7 @@ import com.ai.gardening.entity.enums.AppUserRole;
 import com.ai.gardening.entity.enums.TokenType;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.TokenRepository;
+import com.ai.gardening.service.security.AuthenticationService;
 import com.ai.gardening.service.security.EmailService;
 import com.ai.gardening.service.security.EmailValidatorService;
 import com.ai.gardening.service.security.JwtService;
@@ -19,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.lang.reflect.InvocationTargetException;

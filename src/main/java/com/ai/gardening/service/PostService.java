@@ -2,6 +2,8 @@ package com.ai.gardening.service;
 
 import com.ai.gardening.dtos.AddPostRequest;
 import com.ai.gardening.dtos.AddPostResponse;
+import com.ai.gardening.dtos.UpdatePostRequest;
+import com.ai.gardening.dtos.UpdatePostResponse;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Post;
@@ -18,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,7 +30,8 @@ public class PostService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
     private final PostRepository postRepository;
     private final AppUserRepository appUserRepository;
-    private final ChannelRepository channelRepository;
+    private final ChannelRepository channelRepository; //TODO: change it with channelService
+    private final ChannelService channelService;
     private final TokenService tokenService;
     private final AppUserService appUserService;
 
@@ -53,6 +58,33 @@ public class PostService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse());
     }
 
+    public List<Post> findAllPosts(long channelId) {
+       Channel channel = channelService.findChannelById(channelId);
+
+       if (channel.getId() != null) {
+           return postRepository.findAllByChannelId(channelId);
+       }
+
+       return Collections.emptyList();
+    }
+
+    public ResponseEntity<UpdatePostResponse> updatePost(UpdatePostRequest updatePostRequest, String token) {
+        Post post = findPostById(updatePostRequest.getPostId());
+
+        if(post.getId() != null && (isAppUserTheOwner(post.getOwner(), token))) {
+
+                post.setTitle(updatePostRequest.getTitle());
+                post.setDescription(updatePostRequest.getDescription());
+                postRepository.save(post);
+                LOGGER.info("The post was updated.");
+                return ResponseEntity.status(HttpStatus.OK).body(new UpdatePostResponse(post.getTitle(), post.getDescription()));
+
+        }
+
+        LOGGER.info("The post was not found nor updated.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UpdatePostResponse());
+    }
+
     public ResponseEntity<String> deletePost(long postId, String token) {
 
         Optional<AppUser> appUserOptional = appUserRepository.findByPostId(postId);
@@ -74,6 +106,11 @@ public class PostService {
 
         LOGGER.info("No user or post was found for deletion.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid app user or post.");
+    }
+
+    public Post findPostById(long postId) {
+        Optional<Post> postOptional = postRepository.findById(postId);
+        return postOptional.orElse(new Post());
     }
 
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
