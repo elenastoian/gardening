@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -26,18 +25,24 @@ public class Channel {
     @NonNull
     private boolean isBlocked;
 
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")
     @NonNull
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "admin")
-    private AppUser admin;
+    private AppUser owner;
 
-    @ManyToMany(mappedBy = "channels")
-    private List<AppUser> users = new ArrayList<>() ;
+    @ManyToMany(mappedBy = "joinedChannels")
+    @JsonIgnore
+    private List<AppUser> joinedAppUsers = new ArrayList<>() ;
 
-    public Channel(String name, boolean isBlocked, AppUser admin) {
+    @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Post> posts = new ArrayList<>();
+
+    public Channel(String name, boolean isBlocked, AppUser owner) {
         this.name = name;
         this.isBlocked = isBlocked;
-        this.admin = admin;
+        this.owner = owner;
     }
 }

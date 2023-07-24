@@ -1,6 +1,7 @@
 package com.ai.gardening.controller;
 
-import com.ai.gardening.dtos.ChannelRequest;
+import com.ai.gardening.dtos.CreateChannelRequest;
+import com.ai.gardening.dtos.UpdateChannelRequest;
 import com.ai.gardening.dtos.ChannelResponse;
 import com.ai.gardening.service.ChannelService;
 import lombok.AllArgsConstructor;
@@ -17,27 +18,27 @@ public class ChannelController {
     private ChannelService channelService;
 
     @PostMapping(path = "/create")
-    public ResponseEntity<String> createChannel(@RequestBody ChannelRequest channelRequest) {
-        return channelService.createChannel(channelRequest);
+    public ResponseEntity<ChannelResponse> createChannel(@RequestBody CreateChannelRequest createChannelRequest, @RequestHeader("Authorization") String token) {
+        return channelService.createChannel(createChannelRequest, token);
     }
 
-    @GetMapping(path = "/{userId}")
-    public ResponseEntity<List<ChannelResponse>> getAllGroupsByUserId(@PathVariable("userId") int userId) {
-        return channelService.getAllChannelsByUserId(userId);
+    @GetMapping(path = "/get-all")
+    public ResponseEntity<List<ChannelResponse>> getAllGroupsByUserId(@RequestHeader("Authorization") String token) {
+        return channelService.getAllChannelsByUserId(token);
     }
 
-    @PutMapping(path = "/rename/{channelId}/{name}")
-    public ResponseEntity<String> renameChannel(@PathVariable("channelId") long channelId, @PathVariable("name") String newName) {
-        return channelService.renameChannel(channelId, newName);
+    @PutMapping(path = "/update")
+    public ResponseEntity<String> renameChannel(@RequestBody UpdateChannelRequest updateChannelRequest, @RequestHeader("Authorization") String token) {
+        return channelService.renameChannel(updateChannelRequest, token);
     }
 
-    @DeleteMapping(path = "/delete/{channelId}/{creatorId}")
-    public ResponseEntity<String> deleteChannel(@PathVariable("channelId") long channelId, @PathVariable("creatorId") long creatorId) {
-        return channelService.deleteChannel(channelId, creatorId);
+    @DeleteMapping(path = "/delete/{channelId}")
+    public ResponseEntity<String> deleteChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+        return channelService.deleteChannel(channelId, token);
     }
 
-    @PostMapping(path = "/join/{userId}/{channelId}")
-    public ResponseEntity<String> joinChannel(@PathVariable("userId") long appUserId, @PathVariable("channelId") long channelId) {
-        return channelService.joinChannel(appUserId, channelId);
+    @PostMapping(path = "/join/{channelId}")
+    public ResponseEntity<String> joinChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+        return channelService.joinChannel(channelId, token);
     }
 }
