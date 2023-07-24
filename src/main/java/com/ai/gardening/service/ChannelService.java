@@ -24,24 +24,24 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ChannelService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelService.class);
-    private ChannelRepository channelRepository;
-    private AppUserRepository appUserRepository;
-    private AppUserService appUserService;
-    private TokenService tokenService;
+    private final ChannelRepository channelRepository;
+    private final AppUserRepository appUserRepository;
+    private final AppUserService appUserService;
+    private final TokenService tokenService;
 
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
-        if (findChannelByName(createChannelRequest.getTitle()).getId() == null && appUser.getId() != null) {
-            Channel newChannel = new Channel(createChannelRequest.getTitle(), false, appUser);
+        if (findChannelByName(createChannelRequest.getName()).getId() == null && appUser.getId() != null) {
+            Channel newChannel = new Channel(createChannelRequest.getName(), false, appUser);
             channelRepository.save(newChannel);
             addAppUserToChannel(appUser, newChannel);
 
-            LOGGER.info("A new channel with name {} was saved.", createChannelRequest.getTitle());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelResponse(createChannelRequest.getTitle()));
+            LOGGER.info("A new channel with name {} was saved.", createChannelRequest.getName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelResponse(createChannelRequest.getName()));
         }
 
-        LOGGER.info("A channel with name {} already exists or the user was not found. ", createChannelRequest.getTitle());
+        LOGGER.info("A channel with name {} already exists or the user was not found. ", createChannelRequest.getName());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
     }
 
