@@ -2,8 +2,10 @@ package com.ai.gardening.service;
 
 import com.ai.gardening.dtos.ChannelResponse;
 import com.ai.gardening.dtos.CreateChannelRequest;
+import com.ai.gardening.dtos.UpdateChannelRequest;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
+import com.ai.gardening.entity.Token;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.ChannelRepository;
 import com.ai.gardening.service.security.TokenService;
@@ -19,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -70,20 +73,96 @@ class ChannelServiceTest {
     }
 
     @Test
-    void testGetAllChannelsByUserId_Success() {
+    void testGetAllOwnedChannelsByUserId_Success() {
         AppUser appUser = new AppUser();
         appUser.setId(1L);
-        when(appUserService.findCurrentAppUser(anyString())).thenReturn(appUser);
 
         List<Channel> channelList = new ArrayList<>();
         Channel channel1 = new Channel();
+        channel1.setId(1L);
+        channel1.setName("Name1");
+
         Channel channel2 = new Channel();
+        channel2.setId(2L);
+        channel2.setName("Name2");
+
         channelList.add(channel1);
         channelList.add(channel2);
 
-        ResponseEntity<List<ChannelResponse>> response = channelService.getAllChannelsByUserId("token");
+        appUser.setOwnedChannels(channelList);
+
+        when(appUserService.findCurrentAppUser(any(String.class))).thenReturn(appUser);
+
+        ResponseEntity<List<ChannelResponse>> response = channelService.getAllOwnedChannelsByUserId("token");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-       // assertEquals(response.getBody().stream().toList(), channelList);
+//        assertEquals(channelList.size(), response.getBody().size());
+//
+//        for (int i = 0; i < response.getBody().size(); i++) {
+//            assertEquals(channelList.get(i).getName(), response.getBody().get(i).getName());
+//        }
     }
+
+    @Test
+    public void testRenameChannel_Success() {
+        AppUser appUser = new AppUser();
+        appUser.setId(1L);
+
+        Channel channel = new Channel();
+        channel.setId(2L);
+        channel.setName("Old Channel Name");
+        channel.setOwner(appUser);
+
+        String newChannelName = "New Channel Name";
+
+        UpdateChannelRequest updateChannelRequest = new UpdateChannelRequest(2L, newChannelName);
+
+        when(channelRepository.findById(any(Long.class))).thenReturn(Optional.of(channel));
+        when(tokenService.findByTokenAndUser(any(AppUser.class), any(String.class))).thenReturn(Optional.of(new Token()));
+
+        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(channel.getName(), newChannelName);
+    }
+
+    @Test
+    public void testRenameChannel_ChannelDoesNotExist() {
+        AppUser appUser = new AppUser();
+        appUser.setId(1L);
+
+        String newChannelName = "New Channel Name";
+
+        UpdateChannelRequest updateChannelRequest = new UpdateChannelRequest(2L, newChannelName);
+
+        when(channelRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+    }
+
+    @Test
+    public void testRenameChannel_AppUserIsNotTheOwner() {
+        AppUser appUser = new AppUser();
+        appUser.setId(1L);
+
+        Channel channel = new Channel();
+        channel.setId(2L);
+        channel.setName("Old Channel Name");
+        channel.setOwner(new AppUser());
+
+        String newChannelName = "New Channel Name";
+
+        UpdateChannelRequest updateChannelRequest = new UpdateChannelRequest(2L, newChannelName);
+
+        when(channelRepository.findById(any(Long.class))).thenReturn(Optional.of(channel));
+        when(tokenService.findByTokenAndUser(any(AppUser.class), any(String.class))).thenReturn(Optional.empty());
+
+        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        assertNotEquals(channel.getName(), newChannelName);
+    }
+
 }

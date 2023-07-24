@@ -24,7 +24,7 @@ public class ChannelController {
 
     @GetMapping(path = "/get-all")
     public ResponseEntity<List<ChannelResponse>> getAllGroupsByUserId(@RequestHeader("Authorization") String token) {
-        return channelService.getAllChannelsByUserId(token);
+        return channelService.getAllOwnedChannelsByUserId(token);
     }
 
     @PutMapping(path = "/update")

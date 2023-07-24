@@ -45,7 +45,7 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
     }
 
-    public ResponseEntity<List<ChannelResponse>> getAllChannelsByUserId(String token) {
+    public ResponseEntity<List<ChannelResponse>> getAllOwnedChannelsByUserId(String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
         if (appUser.getId() != null) {
