@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Entity
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 @Getter
 @Setter
 public class AppUser implements UserDetails {
@@ -52,12 +52,13 @@ public class AppUser implements UserDetails {
     @JsonIgnore
     private List<Channel> ownedChannels = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "app_user_channels",
             joinColumns = @JoinColumn(name = "app_user_id"),
             inverseJoinColumns = @JoinColumn(name = "channel_id"))
-    private List<Channel> channels = new ArrayList<>();
+    @JsonIgnore
+    private List<Channel> joinedChannels = new ArrayList<>();
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @JsonIgnore

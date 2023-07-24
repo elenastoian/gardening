@@ -25,14 +25,16 @@ public class Channel {
     @NonNull
     private boolean isBlocked;
 
-    @NonNull
-    @JsonIgnore
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner")
+    @NonNull
+    @JsonIgnore
     private AppUser owner;
 
-    @ManyToMany(mappedBy = "channels")
-    private List<AppUser> users = new ArrayList<>() ;
+    @ManyToMany(mappedBy = "joinedChannels")
+    @JsonIgnore
+    private List<AppUser> joinedAppUsers = new ArrayList<>() ;
 
     @OneToMany(mappedBy = "channel", cascade = CascadeType.ALL)
     @JsonIgnore

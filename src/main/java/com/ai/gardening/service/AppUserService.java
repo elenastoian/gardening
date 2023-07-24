@@ -1,6 +1,7 @@
 package com.ai.gardening.service;
 
 import com.ai.gardening.entity.AppUser;
+import com.ai.gardening.entity.Channel;
 import com.ai.gardening.repository.AppUserRepository;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -31,6 +32,11 @@ public class AppUserService {
             return appUserOptional.get();
         }
         LOGGER.info("AppUser has not been found by the authentication token.");
-        return null;
+        return new AppUser();
+    }
+
+    public void removeJoinedAppUserFromChannel(AppUser appUser, Channel channel){
+        appUser.getJoinedChannels().remove(channel);
+        channel.getJoinedAppUsers().remove(appUser);
     }
 }
