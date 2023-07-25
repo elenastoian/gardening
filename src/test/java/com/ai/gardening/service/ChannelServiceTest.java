@@ -104,7 +104,7 @@ class ChannelServiceTest {
     }
 
     @Test
-    public void testRenameChannel_Success() {
+    void testRenameChannel_Success() {
         AppUser appUser = new AppUser();
         appUser.setId(1L);
 
@@ -127,7 +127,7 @@ class ChannelServiceTest {
     }
 
     @Test
-    public void testRenameChannel_ChannelDoesNotExist() {
+    void testRenameChannel_ChannelDoesNotExist() {
         AppUser appUser = new AppUser();
         appUser.setId(1L);
 
@@ -143,7 +143,7 @@ class ChannelServiceTest {
     }
 
     @Test
-    public void testRenameChannel_AppUserIsNotTheOwner() {
+    void testRenameChannel_AppUserIsNotTheOwner() {
         AppUser appUser = new AppUser();
         appUser.setId(1L);
 

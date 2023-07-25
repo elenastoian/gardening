@@ -133,14 +133,17 @@ public class ChannelService {
     @Transactional
     public ResponseEntity<String> deleteChannel(long channelId, String token) {
         Optional<Channel> channel = channelRepository.findById(channelId);
-        AppUser appUser = channel.get().getOwner();
 
-        if (channel.isPresent() && isAppUserTheOwner(appUser, token)) {
 
-            appUserService.removeJoinedAppUserFromChannel(appUser, channel.get());
-            channelRepository.delete(channel.get());
-            LOGGER.info("The channel with id {} was deleted", channelId);
-            return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
+        if (channel.isPresent()) {
+            AppUser appUser = channel.get().getOwner();
+
+            if (isAppUserTheOwner(appUser, token)) {
+                appUserService.removeJoinedAppUserFromChannel(appUser, channel.get());
+                channelRepository.delete(channel.get());
+                LOGGER.info("The channel with id {} was deleted", channelId);
+                return ResponseEntity.status(HttpStatus.OK).body("The channel was deleted.");
+            }
         }
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The channel does not exist or the user is not the owner.");
@@ -159,7 +162,7 @@ public class ChannelService {
 
         if (appUser.getId() != null && channel.isPresent()) {
 
-            if (!appUser.getJoinedChannels().stream().anyMatch(c -> c.equals(channel.get()))) {
+            if (appUser.getJoinedChannels().stream().noneMatch(c -> c.equals(channel.get()))) {
                 addAppUserToChannel(appUser, channel.get());
                 LOGGER.info("User with id {} joined the channel with id {}", appUser.getId(), channelId);
                 return ResponseEntity.status(HttpStatus.OK).body("New user has joined to the channel.");

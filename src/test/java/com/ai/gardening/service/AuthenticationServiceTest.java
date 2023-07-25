@@ -109,7 +109,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    public void AuthenticationService_revokeAllUserTokens_AllTokensForAppUserAreRevoked() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    void AuthenticationService_revokeAllUserTokens_AllTokensForAppUserAreRevoked() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         // given
         Long userId = 1L;
         AppUser user = AppUser.builder()
@@ -150,7 +150,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    public void AuthenticationService_authenticate_AppUserAuthenticationRequestIsValid() {
+    void AuthenticationService_authenticate_AppUserAuthenticationRequestIsValid() {
         // given
         AuthenticationRequest authRequest = new AuthenticationRequest("testuser@example.com", "testpass");
 
@@ -177,7 +177,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    public void AuthenticationService_authenticate_AppUserAuthenticationRequestIsNotValid() {
+    void AuthenticationService_authenticate_AppUserAuthenticationRequestIsNotValid() {
         // given
         AuthenticationRequest authRequest = new AuthenticationRequest("testuser@example.com", "testpass");
         when(appUserRepository.findByEmail(authRequest.getEmail())).thenReturn(Optional.empty());

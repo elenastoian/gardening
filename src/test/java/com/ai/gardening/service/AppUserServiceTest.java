@@ -41,8 +41,8 @@ class AppUserServiceTest {
         appUser.setJoinedChannels(joinedChannels);
         channel.setJoinedAppUsers(joinedAppUsers);
 
-        Assertions.assertTrue(appUser.getJoinedChannels().equals(joinedChannels));
-        Assertions.assertTrue(channel.getJoinedAppUsers().equals(joinedAppUsers));
+        Assertions.assertEquals(appUser.getJoinedChannels(),joinedChannels);
+        Assertions.assertEquals(channel.getJoinedAppUsers(),joinedAppUsers);
 
         appUserService.removeJoinedAppUserFromChannel(appUser, channel);
 
