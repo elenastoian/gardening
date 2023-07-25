@@ -22,9 +22,14 @@ public class ChannelController {
         return channelService.createChannel(createChannelRequest, token);
     }
 
-    @GetMapping(path = "/get-all")
-    public ResponseEntity<List<ChannelResponse>> getAllGroupsByUserId(@RequestHeader("Authorization") String token) {
-        return channelService.getAllOwnedChannelsByUserId(token);
+    @GetMapping(path = "/get/owned")
+    public ResponseEntity<List<ChannelResponse>> getAllOwnedChannels(@RequestHeader("Authorization") String token) {
+        return channelService.findAllOwnedChannels(token);
+    }
+
+    @GetMapping(path = "/get/joined")
+    public ResponseEntity<List<ChannelResponse>> getAllJoinedChannels(@RequestHeader("Authorization") String token) {
+        return channelService.findAllJoinedChannels(token);
     }
 
     @PutMapping(path = "/update")

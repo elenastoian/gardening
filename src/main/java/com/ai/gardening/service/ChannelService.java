@@ -32,7 +32,13 @@ public class ChannelService {
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
+        if(createChannelRequest.getName() == null) {
+            LOGGER.info("The channel was not created because the name is null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ChannelResponse(createChannelRequest.getName()));
+        }
+
         if (findChannelByName(createChannelRequest.getName()).getId() == null && appUser.getId() != null) {
+
             Channel newChannel = new Channel(createChannelRequest.getName(), false, appUser);
             channelRepository.save(newChannel);
             addAppUserToChannel(appUser, newChannel);
@@ -45,14 +51,30 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
     }
 
-    public ResponseEntity<List<ChannelResponse>> getAllOwnedChannelsByUserId(String token) {
+    public ResponseEntity<List<ChannelResponse>> findAllOwnedChannels(String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
         if (appUser.getId() != null) {
-            List<Channel> groups = channelRepository.findAllByOwner(appUser);
+            List<Channel> channels = channelRepository.findAllByOwner(appUser);
             List<ChannelResponse> responseList = new ArrayList<>();
 
-            groups.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
+            channels.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseList);
+        }
+
+        LOGGER.info("The app user was not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+    }
+
+    public ResponseEntity<List<ChannelResponse>> findAllJoinedChannels(String token) {
+        AppUser appUser = appUserService.findCurrentAppUser(token);
+
+        if (appUser.getId() != null) {
+            List<Channel> channels = channelRepository.findAllByJoinedAppUsers(appUser);
+            List<ChannelResponse> responseList = new ArrayList<>();
+
+            channels.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
 
             return ResponseEntity.status(HttpStatus.OK).body(responseList);
         }

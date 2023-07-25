@@ -93,7 +93,7 @@ class ChannelServiceTest {
 
         when(appUserService.findCurrentAppUser(any(String.class))).thenReturn(appUser);
 
-        ResponseEntity<List<ChannelResponse>> response = channelService.getAllOwnedChannelsByUserId("token");
+        ResponseEntity<List<ChannelResponse>> response = channelService.findAllOwnedChannels("token");
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
 //        assertEquals(channelList.size(), response.getBody().size());
