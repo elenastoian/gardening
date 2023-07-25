@@ -30,17 +30,25 @@ public class PostService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PostService.class);
     private final PostRepository postRepository;
     private final AppUserRepository appUserRepository;
-    private final ChannelRepository channelRepository; //TODO: change it with channelService
+    private final ChannelRepository channelRepository;
     private final ChannelService channelService;
     private final TokenService tokenService;
     private final AppUserService appUserService;
 
+    /**
+     * Creates a new post after checking 2 conditions: the channel has to exist and the logged user has to be found
+     *
+     * @param addPostRequest is the DTO that contains the title and description of the post and the channel's id (the channel that the post will be posted in)
+     * @param token          is the token of the user that wants to create a new post, in order for it to be assigned as the owner of the post
+     * @return a new DTO with the title and description, user's name and channel's name
+     * also returns 200 status for success OR 404 status if the channel or user could not be found
+     */
     @Transactional
     public ResponseEntity<AddPostResponse> addPost(AddPostRequest addPostRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
         Optional<Channel> channel = channelRepository.findById(addPostRequest.getChannelId());
 
-        if (appUser != null && channel.isPresent()) {
+        if (channel.isPresent() && appUser != null) {
             Post newPost = Post.builder()
                     .title(addPostRequest.getTitle())
                     .description(addPostRequest.getDescription())
@@ -58,26 +66,41 @@ public class PostService {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse());
     }
 
+    /**
+     * Finds all posts of a channel
+     *
+     * @param channelId is the id of the channel that the user wants to get all the posts
+     * @return a post of posts or an empty list if the channel was not found
+     */
     public List<Post> findAllPosts(long channelId) {
-       Channel channel = channelService.findChannelById(channelId);
+        Channel channel = channelService.findChannelById(channelId);
 
-       if (channel.getId() != null) {
-           return postRepository.findAllByChannelId(channelId);
-       }
+        if (channel.getId() != null) {
+            return postRepository.findAllByChannelId(channelId);
+        }
 
-       return Collections.emptyList();
+        LOGGER.info("The channel was not found.");
+        return Collections.emptyList();
     }
 
+    /**
+     * Updates a post,after checking if the post exists and the user that wants to update it is also the owner
+     *
+     * @param updatePostRequest is the DTO that will contain the id of the post, the new title and the new description
+     * @param token             is the token of the user that wants to update a post
+     * @return a DTO that contain the new title and description of the post
+     */
     public ResponseEntity<UpdatePostResponse> updatePost(UpdatePostRequest updatePostRequest, String token) {
         Post post = findPostById(updatePostRequest.getPostId());
 
-        if(post.getId() != null && (isAppUserTheOwner(post.getOwner(), token))) {
+        if (post.getId() != null && (isAppUserTheOwner(post.getOwner(), token))) {
 
-                post.setTitle(updatePostRequest.getTitle());
-                post.setDescription(updatePostRequest.getDescription());
-                postRepository.save(post);
-                LOGGER.info("The post was updated.");
-                return ResponseEntity.status(HttpStatus.OK).body(new UpdatePostResponse(post.getTitle(), post.getDescription()));
+            post.setTitle(updatePostRequest.getTitle());
+            post.setDescription(updatePostRequest.getDescription());
+            postRepository.save(post);
+
+            LOGGER.info("The post was updated.");
+            return ResponseEntity.status(HttpStatus.OK).body(new UpdatePostResponse(post.getTitle(), post.getDescription()));
 
         }
 
@@ -85,6 +108,13 @@ public class PostService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new UpdatePostResponse());
     }
 
+    /**
+     * Deletes a post after checking if the user that makes the request if the owner of the post
+     *
+     * @param postId is the id of the post that has to be deleted
+     * @param token  is the token of the user that wants to update a post
+     * @return a message that specifies if the post was deleted or not, with a status 200 for success or 404 if the post or user were not found
+     */
     public ResponseEntity<String> deletePost(long postId, String token) {
 
         Optional<AppUser> appUserOptional = appUserRepository.findByPostId(postId);
@@ -113,6 +143,14 @@ public class PostService {
         return postOptional.orElse(new Post());
     }
 
+    /**
+     * Checks if a user is the owner of a post, based on the authentication token that is received at every request
+     * The method do not check specifically for posts, but its private access restricts its use for posts only
+     *
+     * @param appUser is the user for which the verification is made
+     * @param token   is the authentication token that is used to verify if the user is the owner
+     * @return true if the user is the owner OR false if not
+     */
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
         token = token.substring(7);
         Optional<Token> tokenOptional = tokenService.findByTokenAndUser(appUser, token);
