@@ -39,11 +39,6 @@ public class ChannelService {
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
-        if (createChannelRequest.getName() == null) {
-            LOGGER.info("The channel was not created because the name is null.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ChannelResponse(createChannelRequest.getName()));
-        }
-
         if (findChannelByName(createChannelRequest.getName()).getId() == null && appUser.getId() != null) {
 
             Channel newChannel = new Channel(createChannelRequest.getName(), false, appUser);
