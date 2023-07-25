@@ -24,35 +24,57 @@ import org.springframework.transaction.annotation.Transactional;
 @AllArgsConstructor
 public class ChannelService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ChannelService.class);
-    private ChannelRepository channelRepository;
-    private AppUserRepository appUserRepository;
-    private AppUserService appUserService;
-    private TokenService tokenService;
+    private final ChannelRepository channelRepository;
+    private final AppUserRepository appUserRepository;
+    private final AppUserService appUserService;
+    private final TokenService tokenService;
 
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
-        if (findChannelByName(createChannelRequest.getTitle()).getId() == null && appUser.getId() != null) {
-            Channel newChannel = new Channel(createChannelRequest.getTitle(), false, appUser);
+        if(createChannelRequest.getName() == null) {
+            LOGGER.info("The channel was not created because the name is null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ChannelResponse(createChannelRequest.getName()));
+        }
+
+        if (findChannelByName(createChannelRequest.getName()).getId() == null && appUser.getId() != null) {
+
+            Channel newChannel = new Channel(createChannelRequest.getName(), false, appUser);
             channelRepository.save(newChannel);
             addAppUserToChannel(appUser, newChannel);
 
-            LOGGER.info("A new channel with name {} was saved.", createChannelRequest.getTitle());
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelResponse(createChannelRequest.getTitle()));
+            LOGGER.info("A new channel with name {} was saved.", createChannelRequest.getName());
+            return ResponseEntity.status(HttpStatus.CREATED).body(new ChannelResponse(createChannelRequest.getName()));
         }
 
-        LOGGER.info("A channel with name {} already exists or the user was not found. ", createChannelRequest.getTitle());
+        LOGGER.info("A channel with name {} already exists or the user was not found. ", createChannelRequest.getName());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
     }
 
-    public ResponseEntity<List<ChannelResponse>> getAllChannelsByUserId(String token) {
+    public ResponseEntity<List<ChannelResponse>> findAllOwnedChannels(String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
         if (appUser.getId() != null) {
-            List<Channel> groups = channelRepository.findAllByOwner(appUser);
+            List<Channel> channels = channelRepository.findAllByOwner(appUser);
             List<ChannelResponse> responseList = new ArrayList<>();
 
-            groups.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
+            channels.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseList);
+        }
+
+        LOGGER.info("The app user was not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+    }
+
+    public ResponseEntity<List<ChannelResponse>> findAllJoinedChannels(String token) {
+        AppUser appUser = appUserService.findCurrentAppUser(token);
+
+        if (appUser.getId() != null) {
+            List<Channel> channels = channelRepository.findAllByJoinedAppUsers(appUser);
+            List<ChannelResponse> responseList = new ArrayList<>();
+
+            channels.forEach(g -> responseList.add(new ChannelResponse(g.getName())));
 
             return ResponseEntity.status(HttpStatus.OK).body(responseList);
         }
