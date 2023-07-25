@@ -11,10 +11,6 @@ import com.ai.gardening.entity.enums.AppUserRole;
 import com.ai.gardening.entity.enums.TokenType;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.TokenRepository;
-import com.ai.gardening.service.security.ConfirmationTokenService;
-import com.ai.gardening.service.security.EmailService;
-import com.ai.gardening.service.security.EmailValidatorService;
-import com.ai.gardening.service.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -32,12 +28,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    final String EMAIL_IS_ALREADY_USED_ERROR = "THE EMAIL IS ALREADY USED";
-    final String EMAIL_IS_NOT_VALID_ERROR = "THE EMAIL IS NOT VALID";
+    static final String EMAIL_IS_ALREADY_USED_ERROR = "EMAIL IS ALREADY USED";
+    static final String EMAIL_IS_NOT_VALID_ERROR = "EMAIL IS NOT VALID";
 
-    final String EMAIL_OR_PASSWORD_IS_NOT_VALID_ERROR = "THE EMAIL OR PASSWORD IS NOT VALID";
+    static final String EMAIL_OR_PASSWORD_IS_NOT_VALID_ERROR = "EMAIL OR PASSWORD IS NOT VALID";
 
-    final String EMAIL_IS_NOT_ENABLED_ERROR = "THE EMAIL IS NOT ENABLED";
+    static final String EMAIL_IS_NOT_ENABLED_ERROR = "EMAIL IS NOT ENABLED";
 
 
     //TODO: change it to port 4200 when the frontend will be implemented
