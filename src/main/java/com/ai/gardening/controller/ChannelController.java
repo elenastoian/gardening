@@ -34,7 +34,7 @@ public class ChannelController {
 
     @PutMapping(path = "/update")
     public ResponseEntity<String> renameChannel(@RequestBody UpdateChannelRequest updateChannelRequest, @RequestHeader("Authorization") String token) {
-        return channelService.renameChannel(updateChannelRequest, token);
+        return channelService.updateChannelName(updateChannelRequest, token);
     }
 
     @DeleteMapping(path = "/delete/{channelId}")

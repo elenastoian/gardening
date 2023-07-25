@@ -18,24 +18,30 @@ public class AppUserService {
     private final AppUserRepository appUserRepository;
 
     /**
-     * Method finds the AppUser that has the given token
+     * Method finds the AppUser that has the given token assigned
      *
      * @param token is the token related to the AppUser
-     * @return the AppUser that was found or a new empty AppUser
+     * @return the AppUser that was found or a new empty AppUser if no user was found
      */
     @Transactional
     public AppUser findCurrentAppUser(String token) {
         token = token.substring(7);
         Optional<AppUser> appUserOptional = appUserRepository.findByTokensToken(token);
 
-        if(appUserOptional.isPresent()) {
+        if (appUserOptional.isPresent()) {
             return appUserOptional.get();
         }
         LOGGER.info("AppUser has not been found by the authentication token.");
         return new AppUser();
     }
 
-    public void removeJoinedAppUserFromChannel(AppUser appUser, Channel channel){
+    /**
+     * Method removes the app user from a channel
+     *
+     * @param appUser is the user that is going to be removed from the channel
+     * @param channel is the channel from which the user will be removed
+     */
+    public void removeJoinedAppUserFromChannel(AppUser appUser, Channel channel) {
         appUser.getJoinedChannels().remove(channel);
         channel.getJoinedAppUsers().remove(appUser);
     }

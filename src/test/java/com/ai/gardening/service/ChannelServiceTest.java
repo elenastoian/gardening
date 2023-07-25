@@ -120,7 +120,7 @@ class ChannelServiceTest {
         when(channelRepository.findById(any(Long.class))).thenReturn(Optional.of(channel));
         when(tokenService.findByTokenAndUser(any(AppUser.class), any(String.class))).thenReturn(Optional.of(new Token()));
 
-        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+        ResponseEntity<String> responseEntity = channelService.updateChannelName(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
 
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(channel.getName(), newChannelName);
@@ -137,7 +137,7 @@ class ChannelServiceTest {
 
         when(channelRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
-        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+        ResponseEntity<String> responseEntity = channelService.updateChannelName(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
     }
@@ -159,7 +159,7 @@ class ChannelServiceTest {
         when(channelRepository.findById(any(Long.class))).thenReturn(Optional.of(channel));
         when(tokenService.findByTokenAndUser(any(AppUser.class), any(String.class))).thenReturn(Optional.empty());
 
-        ResponseEntity<String> responseEntity = channelService.renameChannel(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
+        ResponseEntity<String> responseEntity = channelService.updateChannelName(updateChannelRequest, "Bearer .eyJzdWIiOiJlbGVuYXN0b2lhbjAwQGdtYWlsLmNvbSIsImlhdCI6MTY5MDE4OTY0MiwiZXhwIjoxNjkwMTkxMDgyfQ.AyDyj2FXhSQvd3Gh4LHkdU1nxLRkJcU-xUUj3WUO4ew");
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNotEquals(channel.getName(), newChannelName);

@@ -1,4 +1,4 @@
-package com.ai.gardening.service;
+package com.ai.gardening.service.security;
 
 import com.ai.gardening.repository.TokenRepository;
 import jakarta.servlet.http.HttpServletRequest;

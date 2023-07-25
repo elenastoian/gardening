@@ -29,10 +29,17 @@ public class ChannelService {
     private final AppUserService appUserService;
     private final TokenService tokenService;
 
+    /**
+     * Creates a new channel after checking 3 conditions: the name can not be null or used and the app user has to exist
+     *
+     * @param createChannelRequest is the DTO that contains the name of the new channel, with specific validations
+     * @param token                is the token of the user that wants to create a new channel, in order for it to be assigned as the owner of the channel
+     * @return the name of the newly created channel with 200 status or null as the name and 404 status if the channel could not be created
+     */
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
-        if(createChannelRequest.getName() == null) {
+        if (createChannelRequest.getName() == null) {
             LOGGER.info("The channel was not created because the name is null.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ChannelResponse(createChannelRequest.getName()));
         }
@@ -51,6 +58,12 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
     }
 
+    /**
+     * Finds all channels that a user created
+     *
+     * @param token is the authentication token assigned to a user that is used to find the user that makes this request
+     * @return the list of channels' names
+     */
     public ResponseEntity<List<ChannelResponse>> findAllOwnedChannels(String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
@@ -67,6 +80,12 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
     }
 
+    /**
+     * Finds all channels that a user has joined - his own and other user's
+     *
+     * @param token is the authentication token assigned to a user that is used to find the user that makes this request
+     * @return the list of channels' names
+     */
     public ResponseEntity<List<ChannelResponse>> findAllJoinedChannels(String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
 
@@ -83,13 +102,20 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
     }
 
-    public ResponseEntity<String> renameChannel(UpdateChannelRequest updateChannelRequest, String token) {
+    /**
+     * Updates the name of a channel after checking 2 conditions: the channel has to exist and the person that makes the request has to be the owner of the channel
+     *
+     * @param updateChannelRequest is the DTO that contains the channel's id and the new name
+     * @param token                is the authentication token assigned to a user that is used to find the user that makes this request
+     * @return a string message that specifies if the name was changed or not, and status 200 for success or 404 if the name or owner were not found
+     */
+    public ResponseEntity<String> updateChannelName(UpdateChannelRequest updateChannelRequest, String token) {
         Optional<Channel> channel = channelRepository.findById(updateChannelRequest.getChannelId());
 
         if (channel.isPresent() && isAppUserTheOwner(channel.get().getOwner(), token)) {
-            channel.get().setName(updateChannelRequest.getTitle());
+            channel.get().setName(updateChannelRequest.getName());
             channelRepository.save(channel.get());
-            LOGGER.info("The channel was renamed to {}", updateChannelRequest.getTitle());
+            LOGGER.info("The channel was renamed to {}", updateChannelRequest.getName());
             return ResponseEntity.status(HttpStatus.OK).body("The channel was renamed.");
         }
 
@@ -97,6 +123,13 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The channel or owner was not found.");
     }
 
+    /**
+     * Deletes an existing channel, after checking if the user that makes the request is the owner
+     *
+     * @param channelId is the id of the channel that has to be deleted
+     * @param token     is the authentication token assigned to a user that is used to find the user that makes this request
+     * @return a message that specifies if the channel was deleted or not, with a status 200 for success or 404 if the channel or user were not found
+     */
     @Transactional
     public ResponseEntity<String> deleteChannel(long channelId, String token) {
         Optional<Channel> channel = channelRepository.findById(channelId);
@@ -113,6 +146,13 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The channel does not exist or the user is not the owner.");
     }
 
+    /**
+     * Adds a user to a new channel
+     *
+     * @param channelId is the id of the channel the user wants to join
+     * @param token     is the authentication token assigned to a user that is used to find the user that makes this request
+     * @return a message that specifies if the user joined or not, with a status 200 for success or 404 for channel or user were not found
+     */
     public ResponseEntity<String> joinChannel(long channelId, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
         Optional<Channel> channel = channelRepository.findById(channelId);
@@ -133,6 +173,12 @@ public class ChannelService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User or channel was not found. Use did not joined the channel.");
     }
 
+    /**
+     * Adds a user to a new channel - this method is used for the many-to-many relationship between AppUser and Channel
+     *
+     * @param appUser is the user that wants to join
+     * @param channel is the channel that an user wants to join
+     */
     public void addAppUserToChannel(AppUser appUser, Channel channel) {
         try {
             appUser.getJoinedChannels().add(channel);
@@ -140,23 +186,43 @@ public class ChannelService {
 
             appUserRepository.save(appUser);
             channelRepository.save(channel);
-        } catch (Exception e) {
+        } catch (Exception e) { //TODO: change exception
             LOGGER.error("Failed to add app user to channel");
             throw e;
         }
     }
 
+    /**
+     * Finds a channel by its name
+     *
+     * @param channelName is the name of the channel that needs to be found
+     * @return the channel that was found OR a new empty channel if none was found.
+     */
     public Channel findChannelByName(String channelName) {
         Optional<Channel> channel = channelRepository.findByName(channelName);
         return channel.orElse(new Channel());
     }
 
+    /**
+     * Finds a channel by its id
+     *
+     * @param channelId is the id of the channel that needs to be found
+     * @return the channel that was found OR a new empty channel if none was found.
+     */
     public Channel findChannelById(long channelId) {
         Optional<Channel> channel = channelRepository.findById(channelId);
 
         return channel.isPresent() ? channel.get() : new Channel();
     }
 
+    /**
+     * Checks if a user is the owner of a channel, based on the authentication token that is received at every request
+     * The method do not check specifically for channels, but its private access restricts its use for channels only
+     *
+     * @param appUser is the user for which the verification is made
+     * @param token   is the authentication token that is used to verify if the user is the owner
+     * @return true if the user is the owner OR false if not
+     */
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
         token = token.substring(7);
         Optional<Token> tokenOptional = tokenService.findByTokenAndUser(appUser, token);

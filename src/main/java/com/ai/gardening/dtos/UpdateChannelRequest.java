@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class UpdateChannelRequest {
     private Long channelId;
-    private String title;
+    private String name;
 }
