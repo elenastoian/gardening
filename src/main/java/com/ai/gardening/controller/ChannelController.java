@@ -4,6 +4,7 @@ import com.ai.gardening.dtos.CreateChannelRequest;
 import com.ai.gardening.dtos.UpdateChannelRequest;
 import com.ai.gardening.dtos.ChannelResponse;
 import com.ai.gardening.service.ChannelService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class ChannelController {
     private ChannelService channelService;
 
     @PostMapping(path = "/create")
-    public ResponseEntity<ChannelResponse> createChannel(@RequestBody CreateChannelRequest createChannelRequest, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ChannelResponse> createChannel(@RequestBody @Valid CreateChannelRequest createChannelRequest, @RequestHeader("Authorization") String token) {
         return channelService.createChannel(createChannelRequest, token);
     }
 
@@ -33,7 +34,7 @@ public class ChannelController {
     }
 
     @PutMapping(path = "/update")
-    public ResponseEntity<String> renameChannel(@RequestBody UpdateChannelRequest updateChannelRequest, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<String> renameChannel(@RequestBody @Valid UpdateChannelRequest updateChannelRequest, @RequestHeader("Authorization") String token) {
         return channelService.updateChannelName(updateChannelRequest, token);
     }
 
