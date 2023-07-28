@@ -80,7 +80,7 @@ class AuthenticationServiceTest {
 
         // assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertEquals("THE EMAIL IS NOT VALID", response.getBody().getToken());
+        assertEquals("EMAIL IS NOT VALID", response.getBody().getToken());
     }
 
     @Test
@@ -189,7 +189,7 @@ class AuthenticationServiceTest {
         verify(tokenRepository, never()).save(any(Token.class));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("THE EMAIL OR PASSWORD IS NOT VALID", response.getBody().getToken());
+        assertEquals("EMAIL OR PASSWORD IS NOT VALID", response.getBody().getToken());
     }
 
 }
