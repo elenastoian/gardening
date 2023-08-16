@@ -1,8 +1,8 @@
 package com.ai.gardening.controller;
 
-import com.ai.gardening.dtos.AuthenticationRequest;
-import com.ai.gardening.dtos.AuthenticationResponse;
-import com.ai.gardening.dtos.RegisterRequest;
+import com.ai.gardening.dto.AuthenticationRequest;
+import com.ai.gardening.dto.AuthenticationResponse;
+import com.ai.gardening.dto.RegisterRequest;
 import com.ai.gardening.service.security.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

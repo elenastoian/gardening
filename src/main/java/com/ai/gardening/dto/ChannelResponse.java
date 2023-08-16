@@ -1,4 +1,4 @@
-package com.ai.gardening.dtos;
+package com.ai.gardening.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,8 +7,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-public class DeletePostRequest {
-    private long postId;
+@NoArgsConstructor
+public class ChannelResponse {
+    private String name;
 }

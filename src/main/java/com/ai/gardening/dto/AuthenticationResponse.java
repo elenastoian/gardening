@@ -1,4 +1,4 @@
-package com.ai.gardening.dtos;
+package com.ai.gardening.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

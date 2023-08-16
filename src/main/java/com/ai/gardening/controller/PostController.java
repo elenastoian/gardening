@@ -1,6 +1,6 @@
 package com.ai.gardening.controller;
 
-import com.ai.gardening.dtos.*;
+import com.ai.gardening.dto.*;
 import com.ai.gardening.entity.Post;
 import com.ai.gardening.service.PostService;
 import jakarta.validation.Valid;

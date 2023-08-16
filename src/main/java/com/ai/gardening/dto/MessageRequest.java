@@ -1,4 +1,4 @@
-package com.ai.gardening.dtos;
+package com.ai.gardening.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChannelResponse {
-    private String name;
+public class MessageRequest {
+    private String role;
+    private String content;
 }

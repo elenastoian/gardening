@@ -1,8 +1,8 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.CreateChannelRequest;
-import com.ai.gardening.dtos.UpdateChannelRequest;
-import com.ai.gardening.dtos.ChannelResponse;
+import com.ai.gardening.dto.CreateChannelRequest;
+import com.ai.gardening.dto.UpdateChannelRequest;
+import com.ai.gardening.dto.ChannelResponse;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Token;
@@ -219,6 +219,17 @@ public class ChannelService {
     }
 
     /**
+     *
+     * @param appUser
+     * @return true if the user has joined the channel & false if not
+     */
+    public boolean findChannelByJoinedAppUser(AppUser appUser) {
+        List<Channel> channel = channelRepository.findAllByJoinedAppUsers(appUser);
+
+        return !channel.isEmpty();
+    }
+
+    /**
      * Checks if a user is the owner of a channel, based on the authentication token that is received at every request
      * The method do not check specifically for channels, but its private access restricts its use for channels only
      *
@@ -235,7 +246,7 @@ public class ChannelService {
             return true;
         }
 
-        LOGGER.info("User with id {} is the admin of this post.", appUser.getId());
+        LOGGER.info("User with id {} is not the admin of this post.", appUser.getId());
         return false;
     }
 }

@@ -69,6 +69,10 @@ public class AppUser implements UserDetails {
     @JsonIgnore
     private List<Token> tokens = new ArrayList<>();
 
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Comment> comment = new ArrayList<>();
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(appUserRole.name()));

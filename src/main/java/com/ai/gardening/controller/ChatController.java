@@ -1,8 +1,7 @@
 package com.ai.gardening.controller;
 
-import com.ai.gardening.dtos.ChatRequest;
-import com.ai.gardening.dtos.ChatResponse;
-import lombok.AllArgsConstructor;
+import com.ai.gardening.dto.ChatRequest;
+import com.ai.gardening.dto.ChatResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;

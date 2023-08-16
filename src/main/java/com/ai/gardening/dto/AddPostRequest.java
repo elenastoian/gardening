@@ -1,4 +1,4 @@
-package com.ai.gardening.dtos;
+package com.ai.gardening.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;

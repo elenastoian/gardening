@@ -1,9 +1,9 @@
 package com.ai.gardening.service.security;
 
-import com.ai.gardening.dtos.AuthenticationRequest;
-import com.ai.gardening.dtos.AuthenticationResponse;
-import com.ai.gardening.dtos.RegisterRequest;
-import com.ai.gardening.dtos.TokenConfirmationResponse;
+import com.ai.gardening.dto.AuthenticationRequest;
+import com.ai.gardening.dto.AuthenticationResponse;
+import com.ai.gardening.dto.RegisterRequest;
+import com.ai.gardening.dto.TokenConfirmationResponse;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.ConfirmationToken;
 import com.ai.gardening.entity.Token;
