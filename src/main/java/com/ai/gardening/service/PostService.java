@@ -50,18 +50,25 @@ public class PostService {
         if (appUser != null) {
             Optional<Channel> channel = channelRepository.findById(addPostRequest.getChannelId());
 
-            if (channel.isPresent() && appUser != null) {
-                Post newPost = Post.builder()
-                        .title(addPostRequest.getTitle())
-                        .description(addPostRequest.getDescription())
-                        .owner(appUser)
-                        .channel(channel.get())
-                        .build();
-                postRepository.save(newPost);
-                LOGGER.info("New post was added.");
+            if (channel.isPresent() ) {
+                boolean isAppUserMemberOfChannel = channelService.findChannelByJoinedAppUser(appUser);
 
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse(newPost.getTitle(),
-                        newPost.getDescription(), appUser.getName(), channel.get().getName()));
+                if (isAppUserMemberOfChannel) {
+                    Post newPost = Post.builder()
+                            .title(addPostRequest.getTitle())
+                            .description(addPostRequest.getDescription())
+                            .owner(appUser)
+                            .channel(channel.get())
+                            .build();
+                    postRepository.save(newPost);
+                    LOGGER.info("New post was added.");
+
+                    return ResponseEntity.status(HttpStatus.CREATED).body(new AddPostResponse(newPost.getTitle(),
+                            newPost.getDescription(), appUser.getName(), channel.get().getName()));
+                } else {
+                    LOGGER.info("The user has not joined the channel. No post was created.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse());
+                }
             }
         }
         LOGGER.info("The user or channel was not found. No post was created.");

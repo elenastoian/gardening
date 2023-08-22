@@ -49,15 +49,15 @@ public class CommentService {
                 commentRepository.save(comment);
                 LOGGER.info("New comment was added by {}", appUser.getName());
 
-                return ResponseEntity.status(HttpStatus.OK).body(new CreateCommentResponse(createCommentRequest.getComment(), appUser.getName(), post));
+                return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCommentResponse(createCommentRequest.getComment(), appUser.getName(), post));
             }
 
-            LOGGER.info("The channel was not found. No comment was added.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CreateCommentResponse());
+            LOGGER.info("The user has not joined the channel. No comment was added.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CreateCommentResponse());
         }
 
         LOGGER.info("The user that wants to add a comment was not found.");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new CreateCommentResponse());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CreateCommentResponse());
     }
 
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
