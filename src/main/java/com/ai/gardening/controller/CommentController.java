@@ -2,6 +2,7 @@ package com.ai.gardening.controller;
 
 import com.ai.gardening.dto.CreateCommentRequest;
 import com.ai.gardening.dto.CreateCommentResponse;
+import com.ai.gardening.dto.UpdateCommentRequest;
 import com.ai.gardening.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -21,8 +22,8 @@ public class CommentController {
     }
 
     @PutMapping(path = "/update")
-    public void updateComment() {
-
+    public ResponseEntity<String> updateComment(@RequestBody @Valid UpdateCommentRequest updateCommentRequest, @RequestHeader("Authorization") String token) {
+        return commentService.updateComment(updateCommentRequest, token);
     }
 
     @GetMapping(path = "/find-all")

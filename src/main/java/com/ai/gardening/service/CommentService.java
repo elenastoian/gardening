@@ -2,6 +2,7 @@ package com.ai.gardening.service;
 
 import com.ai.gardening.dto.CreateCommentRequest;
 import com.ai.gardening.dto.CreateCommentResponse;
+import com.ai.gardening.dto.UpdateCommentRequest;
 import com.ai.gardening.entity.*;
 import com.ai.gardening.repository.CommentRepository;
 import com.ai.gardening.service.security.TokenService;
@@ -49,7 +50,7 @@ public class CommentService {
                 commentRepository.save(comment);
                 LOGGER.info("New comment was added by {}", appUser.getName());
 
-                return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCommentResponse(createCommentRequest.getComment(), appUser.getName(), post));
+                return ResponseEntity.status(HttpStatus.CREATED).body(new CreateCommentResponse(createCommentRequest.getComment(), appUser.getName(), post.getId()));
             }
 
             LOGGER.info("The user has not joined the channel. No comment was added.");
@@ -59,6 +60,29 @@ public class CommentService {
         LOGGER.info("The user that wants to add a comment was not found.");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new CreateCommentResponse());
     }
+
+    public ResponseEntity<String> updateComment(UpdateCommentRequest updateCommentRequest, String token) {
+        AppUser appUser = appUserService.findCurrentAppUser(token);
+
+        if (appUser != null) {
+
+            Optional<Comment> comment = commentRepository.findById(updateCommentRequest.getCommentId());
+
+            if (comment.isPresent() && comment.get().getOwner().equals(appUser)) {
+
+                comment.get().setComment(updateCommentRequest.getComment());
+                commentRepository.save(comment.get());
+
+                LOGGER.info("The comment was updated by {}.", appUser.getName());
+                return ResponseEntity.status(HttpStatus.OK).body("The comment was updated with:\n" + updateCommentRequest.getComment());
+            }
+            LOGGER.info("The user is not the owner of the comment.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The user is not the owner of the comment.");
+        }
+        LOGGER.info("The user that update the add a comment was not found.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The user was not found.");
+    }
+
 
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
         token = token.substring(7);
@@ -72,4 +96,6 @@ public class CommentService {
         LOGGER.info("User with id {} is not the admin of this comment.", appUser.getId());
         return false;
     }
+
+
 }
