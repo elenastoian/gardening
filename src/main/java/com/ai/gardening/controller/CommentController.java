@@ -3,11 +3,14 @@ package com.ai.gardening.controller;
 import com.ai.gardening.dto.CreateCommentRequest;
 import com.ai.gardening.dto.CreateCommentResponse;
 import com.ai.gardening.dto.UpdateCommentRequest;
+import com.ai.gardening.entity.Comment;
 import com.ai.gardening.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/comment")
@@ -27,12 +30,12 @@ public class CommentController {
     }
 
     @GetMapping(path = "/find-all")
-    public void findAllComments() {
-
+    public List<Comment> findAllComments(Long postId) {
+        return commentService.findAllComments(postId);
     }
 
     @DeleteMapping(path = "/delete")
-    public void deleteComment() {
-
+    public ResponseEntity<String> deleteComment(Long commentId, @RequestHeader("Authorization") String token) {
+        return commentService.deleteComment(commentId, token);
     }
 }

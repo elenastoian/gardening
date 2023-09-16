@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -83,6 +84,25 @@ public class CommentService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The user was not found.");
     }
 
+    public List<Comment> findAllComments(Long postId) {
+
+        List<Comment> commentList = commentRepository.findAllByPostId(postId);
+
+        LOGGER.info("The user is not the owner of the comment.");
+        return commentRepository.findAllByPostId(postId);
+    }
+
+    public ResponseEntity<String> deleteComment(Long commentId, String token) {
+        AppUser appUser = appUserService.findCurrentAppUser(token);
+
+        if (appUser != null && isAppUserTheOwner(appUser, token)) {
+            commentRepository.deleteById(commentId);
+
+            return ResponseEntity.status(HttpStatus.OK).body("The comment was deleted.");
+        }
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The comment was deleted because the owner was not found.");
+    }
 
     private boolean isAppUserTheOwner(AppUser appUser, String token) {
         token = token.substring(7);
@@ -96,6 +116,4 @@ public class CommentService {
         LOGGER.info("User with id {} is not the admin of this comment.", appUser.getId());
         return false;
     }
-
-
 }
