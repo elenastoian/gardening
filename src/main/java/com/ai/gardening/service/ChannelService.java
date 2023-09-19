@@ -1,5 +1,6 @@
 package com.ai.gardening.service;
 
+import com.ai.gardening.dtos.AllChannelsResponse;
 import com.ai.gardening.dtos.CreateChannelRequest;
 import com.ai.gardening.dtos.UpdateChannelRequest;
 import com.ai.gardening.dtos.ChannelResponse;
@@ -51,6 +52,17 @@ public class ChannelService {
 
         LOGGER.info("A channel with name {} already exists or the user was not found. ", createChannelRequest.getName());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ChannelResponse());
+    }
+
+    public ResponseEntity<List<AllChannelsResponse>> findAllChannels() {
+        List<Channel> channels = channelRepository.findAll();
+
+        List<AllChannelsResponse> response = new ArrayList<>();
+        channels.forEach(channel -> {
+           response.add(new AllChannelsResponse(channel.getId(), channel.getName()));
+        });
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     /**

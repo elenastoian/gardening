@@ -1,5 +1,6 @@
 package com.ai.gardening.controller;
 
+import com.ai.gardening.dtos.AllChannelsResponse;
 import com.ai.gardening.dtos.CreateChannelRequest;
 import com.ai.gardening.dtos.UpdateChannelRequest;
 import com.ai.gardening.dtos.ChannelResponse;
@@ -21,6 +22,11 @@ public class ChannelController {
     @PostMapping(path = "/create")
     public ResponseEntity<ChannelResponse> createChannel(@RequestBody @Valid CreateChannelRequest createChannelRequest, @RequestHeader("Authorization") String token) {
         return channelService.createChannel(createChannelRequest, token);
+    }
+
+    @GetMapping(path = "/all")
+    public ResponseEntity<List<AllChannelsResponse>> getAllChannels() {
+        return channelService.findAllChannels();
     }
 
     @GetMapping(path = "/get/owned")

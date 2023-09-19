@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Value("${allowed.origin.www}")
     private String allowedOriginWithWWW;
 
-    private static final String[] WHITE_LIST = {"/auth/**"};
+    private static final String[] WHITE_LIST = {"/auth/**", "/channel/all", "/chat/**"};
 
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
