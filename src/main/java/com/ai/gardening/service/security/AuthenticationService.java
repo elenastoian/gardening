@@ -28,12 +28,13 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    static final String EMAIL_IS_ALREADY_USED_ERROR = "EMAIL IS ALREADY USED";
-    static final String EMAIL_IS_NOT_VALID_ERROR = "EMAIL IS NOT VALID";
-
-    static final String EMAIL_OR_PASSWORD_IS_NOT_VALID_ERROR = "EMAIL OR PASSWORD IS NOT VALID";
-
-    static final String EMAIL_IS_NOT_ENABLED_ERROR = "EMAIL IS NOT ENABLED";
+    /* ERROR CODE */
+    final String EMAIL_IS_ALREADY_USED_ERROR = "1";
+    final String EMAIL_IS_NOT_VALID_ERROR = "2";
+    final String EMAIL_OR_PASSWORD_IS_NOT_VALID_ERROR = "3";
+    final String EMAIL_IS_NOT_ENABLED_ERROR = "4";
+    final String EMAIL_IS_BANNED = "5";
+    /*END ERROR FLAGS */
 
 
     //TODO: change it to port 4200 when the frontend will be implemented
