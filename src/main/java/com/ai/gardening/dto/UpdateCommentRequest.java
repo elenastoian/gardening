@@ -1,15 +1,15 @@
-package com.ai.gardening.dtos;
+package com.ai.gardening.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatePostResponse {
-    private String title;
-    private String description;
+@Getter
+@Setter
+public class UpdateCommentRequest {
+    private String comment;
+    private Long commentId;
 }

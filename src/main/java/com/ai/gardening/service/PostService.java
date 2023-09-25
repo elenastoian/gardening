@@ -1,9 +1,9 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.AddPostRequest;
-import com.ai.gardening.dtos.AddPostResponse;
-import com.ai.gardening.dtos.UpdatePostRequest;
-import com.ai.gardening.dtos.UpdatePostResponse;
+import com.ai.gardening.dto.AddPostRequest;
+import com.ai.gardening.dto.AddPostResponse;
+import com.ai.gardening.dto.UpdatePostRequest;
+import com.ai.gardening.dto.UpdatePostResponse;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Post;
@@ -46,22 +46,31 @@ public class PostService {
     @Transactional
     public ResponseEntity<AddPostResponse> addPost(AddPostRequest addPostRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
-        Optional<Channel> channel = channelRepository.findById(addPostRequest.getChannelId());
 
-        if (channel.isPresent() && appUser != null) {
-            Post newPost = Post.builder()
-                    .title(addPostRequest.getTitle())
-                    .description(addPostRequest.getDescription())
-                    .owner(appUser)
-                    .channel(channel.get())
-                    .build();
-            postRepository.save(newPost);
-            LOGGER.info("New post was added.");
+        if (appUser != null) {
+            Optional<Channel> channel = channelRepository.findById(addPostRequest.getChannelId());
 
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse(newPost.getTitle(),
-                    newPost.getDescription(), appUser.getName(), channel.get().getName()));
+            if (channel.isPresent() ) {
+                boolean isAppUserMemberOfChannel = channelService.findChannelByJoinedAppUser(appUser);
+
+                if (isAppUserMemberOfChannel) {
+                    Post newPost = Post.builder()
+                            .title(addPostRequest.getTitle())
+                            .description(addPostRequest.getDescription())
+                            .owner(appUser)
+                            .channel(channel.get())
+                            .build();
+                    postRepository.save(newPost);
+                    LOGGER.info("New post was added.");
+
+                    return ResponseEntity.status(HttpStatus.CREATED).body(new AddPostResponse(newPost.getTitle(),
+                            newPost.getDescription(), appUser.getName(), channel.get().getName()));
+                } else {
+                    LOGGER.info("The user has not joined the channel. No post was created.");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse());
+                }
+            }
         }
-
         LOGGER.info("The user or channel was not found. No post was created.");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new AddPostResponse());
     }
@@ -160,7 +169,7 @@ public class PostService {
             return true;
         }
 
-        LOGGER.info("User with id {} is the admin of this post.", appUser.getId());
+        LOGGER.info("User with id {} is not the admin of this post.", appUser.getId());
         return false;
     }
 }

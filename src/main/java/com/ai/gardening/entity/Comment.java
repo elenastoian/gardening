@@ -1,13 +1,8 @@
 package com.ai.gardening.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "comment")
@@ -15,9 +10,25 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Comment {
 
     @Id
     @GeneratedValue
     private Long id;
+
+    @NonNull
+    private String comment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner")
+    @NonNull
+    @JsonIgnore
+    private AppUser owner;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post")
+    @NonNull
+    @JsonIgnore
+    private Post post;
 }

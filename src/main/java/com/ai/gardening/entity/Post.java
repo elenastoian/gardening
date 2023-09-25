@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,13 +24,17 @@ public class Post {
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "channel")
-    private Channel channel;
+    @JoinColumn(name = "owner")
+    private AppUser owner;
 
     @NonNull
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "owner")
-    private AppUser owner;
+    @JoinColumn(name = "channel")
+    private Channel channel;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<Comment> comment = new ArrayList<>();
 
 }

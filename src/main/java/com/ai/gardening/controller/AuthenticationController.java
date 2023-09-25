@@ -1,10 +1,10 @@
 package com.ai.gardening.controller;
 
 
-import com.ai.gardening.dtos.AuthenticationRequest;
-import com.ai.gardening.dtos.AuthenticationResponse;
-import com.ai.gardening.dtos.RegisterRequest;
-import com.ai.gardening.dtos.TokenConfirmationResponse;
+import com.ai.gardening.dto.AuthenticationRequest;
+import com.ai.gardening.dto.AuthenticationResponse;
+import com.ai.gardening.dto.RegisterRequest;
+import com.ai.gardening.dto.TokenConfirmationResponse;
 import com.ai.gardening.service.security.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,8 +1,8 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.ChannelResponse;
-import com.ai.gardening.dtos.CreateChannelRequest;
-import com.ai.gardening.dtos.UpdateChannelRequest;
+import com.ai.gardening.dto.ChannelResponse;
+import com.ai.gardening.dto.CreateChannelRequest;
+import com.ai.gardening.dto.UpdateChannelRequest;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Token;

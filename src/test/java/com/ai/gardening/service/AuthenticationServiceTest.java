@@ -1,8 +1,8 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.AuthenticationRequest;
-import com.ai.gardening.dtos.AuthenticationResponse;
-import com.ai.gardening.dtos.RegisterRequest;
+import com.ai.gardening.dto.AuthenticationRequest;
+import com.ai.gardening.dto.AuthenticationResponse;
+import com.ai.gardening.dto.RegisterRequest;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Token;
 import com.ai.gardening.entity.enums.AppUserRole;
@@ -80,7 +80,7 @@ class AuthenticationServiceTest {
 
         // assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertEquals("THE EMAIL IS NOT VALID", response.getBody().getToken());
+        assertEquals("EMAIL IS NOT VALID", response.getBody().getToken());
     }
 
     @Test
@@ -189,7 +189,7 @@ class AuthenticationServiceTest {
         verify(tokenRepository, never()).save(any(Token.class));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("THE EMAIL OR PASSWORD IS NOT VALID", response.getBody().getToken());
+        assertEquals("EMAIL OR PASSWORD IS NOT VALID", response.getBody().getToken());
     }
 
 }
