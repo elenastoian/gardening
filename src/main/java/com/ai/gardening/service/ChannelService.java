@@ -1,9 +1,6 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.AllChannelsResponse;
-import com.ai.gardening.dtos.CreateChannelRequest;
-import com.ai.gardening.dtos.UpdateChannelRequest;
-import com.ai.gardening.dtos.ChannelResponse;
+import com.ai.gardening.dtos.*;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Token;
@@ -56,10 +53,32 @@ public class ChannelService {
 
     public ResponseEntity<List<AllChannelsResponse>> findAllChannels() {
         List<Channel> channels = channelRepository.findAll();
-
         List<AllChannelsResponse> response = new ArrayList<>();
+
         channels.forEach(channel -> {
-           response.add(new AllChannelsResponse(channel.getId(), channel.getName()));
+            List<AppUser> joinedUsers = channel.getJoinedAppUsers(); // Replace this with the actual method to get joined users for a channel
+
+            List<AppUserResponse> joinedAppUsers = new ArrayList<>();
+            joinedUsers.forEach(joinedUser -> {
+                AppUserResponse appUserResponse = new AppUserResponse();
+                appUserResponse.setId(joinedUser.getId());
+                appUserResponse.setName(joinedUser.getName());
+                joinedAppUsers.add(appUserResponse);
+            });
+
+            AppUserResponse owner = new AppUserResponse();
+            owner.setId(channel.getOwner().getId());
+            owner.setName(channel.getOwner().getName());
+
+            AllChannelsResponse allChannelsResponse = new AllChannelsResponse(
+                    channel.getId(),
+                    channel.getName(),
+                    channel.isBlocked(),
+                    owner,
+                    joinedAppUsers
+            );
+
+            response.add(allChannelsResponse);
         });
 
         return ResponseEntity.status(HttpStatus.OK).body(response);

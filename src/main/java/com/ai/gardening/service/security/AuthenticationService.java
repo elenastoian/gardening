@@ -11,7 +11,11 @@ import com.ai.gardening.entity.enums.AppUserRole;
 import com.ai.gardening.entity.enums.TokenType;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.TokenRepository;
+import com.ai.gardening.service.AppUserService;
+import com.ai.gardening.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +32,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthenticationService.class);
     /* ERROR CODE */
     final String EMAIL_IS_ALREADY_USED_ERROR = "1";
     final String EMAIL_IS_NOT_VALID_ERROR = "2";
@@ -48,6 +54,7 @@ public class AuthenticationService {
     private final TokenRepository tokenRepository;
     private final EmailValidatorService emailValidatorService;
     private final EmailService emailService;
+    private final AppUserService appUserService;
 
     private final ConfirmationTokenService confirmationTokenService;
 
@@ -85,7 +92,7 @@ public class AuthenticationService {
 
         confirmationTokenService.saveConfirmationToken(confirmationToken);
 
-        final String link = frontendHostURL + "/email-confirmation/?token=" + token;
+        final String link = frontendHostURL + "#/email-confirmation?token=" + token;
 
         this.emailService.send(appUser.getEmail(), emailService.buildEmail(appUser.getName(), link));
 
@@ -149,10 +156,17 @@ public class AuthenticationService {
 
         if (tokenExists) {
 
+            LOGGER.info("log : AuthenticationService - confirmToken - ConfirmationToken is found");
+
             tokenFound = confirmationTokenService.getToken(token);
             ConfirmationToken tokenObject = tokenFound.get();
 
+
+
             if (tokenObject.getConfirmedAt() != null) {
+
+                LOGGER.info("log : AuthenticationService - confirmToken - Token is already confirmed");
+
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new TokenConfirmationResponse(
                         false
                 ));
@@ -161,28 +175,40 @@ public class AuthenticationService {
             LocalDateTime expiredAt = tokenObject.getExpiresAt();
 
             if (expiredAt.isBefore(LocalDateTime.now())) {
+
+                LOGGER.info("log : AuthenticationService - confirmToken - Token is expired");
+
                 return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new TokenConfirmationResponse(
                         false
                 ));
             }
 
             Integer confirmed = confirmationTokenService.setConfirmedAt(token);
-            Integer enabled = appUserRepository.enableAppUser(tokenObject.getAppUser().getEmail());
+            Integer enabled = appUserService.enableAppUser(tokenObject.getAppUser().getEmail());
 
             if ((confirmed == 1) && (enabled == 1)) {
+
+                LOGGER.info("log : AuthenticationService - confirmToken - Email confirmation successful");
+
                 return ResponseEntity.status(HttpStatus.OK).body(new TokenConfirmationResponse(
                         true
                 ));
             }
 
         } else {
+
+            LOGGER.info("log : AuthenticationService - confirmToken - ConfirmationToken is not found");
             return ResponseEntity.status(HttpStatus.OK).body(new TokenConfirmationResponse(
                     false
             ));
         }
+
+        LOGGER.info("log : AuthenticationService - confirmToken - Something went wrong");
+
         return ResponseEntity.status(HttpStatus.OK).body(new TokenConfirmationResponse(
+
+
                 false
         ));
-
     }
 }

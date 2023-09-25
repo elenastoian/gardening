@@ -45,4 +45,8 @@ public class AppUserService {
         appUser.getJoinedChannels().remove(channel);
         channel.getJoinedAppUsers().remove(appUser);
     }
+
+    public Integer enableAppUser(String email) {
+        return appUserRepository.enableAppUser(email);
+    }
 }

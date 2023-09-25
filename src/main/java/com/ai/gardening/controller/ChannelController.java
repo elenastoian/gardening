@@ -39,6 +39,11 @@ public class ChannelController {
         return channelService.findAllJoinedChannels(token);
     }
 
+    @GetMapping(path = "/get/{id}")
+    public ResponseEntity<String> getChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+        return null; //TODO: to be implemented
+    }
+
     @PutMapping(path = "/update")
     public ResponseEntity<String> renameChannel(@RequestBody @Valid UpdateChannelRequest updateChannelRequest, @RequestHeader("Authorization") String token) {
         return channelService.updateChannelName(updateChannelRequest, token);
