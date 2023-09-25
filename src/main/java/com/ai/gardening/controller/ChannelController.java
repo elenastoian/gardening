@@ -29,17 +29,17 @@ public class ChannelController {
         return channelService.findAllChannels();
     }
 
-    @GetMapping(path = "/get/owned")
+    @GetMapping(path = "/owned")
     public ResponseEntity<List<ChannelResponse>> getAllOwnedChannels(@RequestHeader("Authorization") String token) {
         return channelService.findAllOwnedChannels(token);
     }
 
-    @GetMapping(path = "/get/joined")
+    @GetMapping(path = "/joined")
     public ResponseEntity<List<ChannelResponse>> getAllJoinedChannels(@RequestHeader("Authorization") String token) {
         return channelService.findAllJoinedChannels(token);
     }
 
-    @GetMapping(path = "/get/{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<String> getChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
         return null; //TODO: to be implemented
     }
@@ -57,5 +57,10 @@ public class ChannelController {
     @PostMapping(path = "/join/{channelId}")
     public ResponseEntity<String> joinChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
         return channelService.joinChannel(channelId, token);
+    }
+
+    @PostMapping(path = "/join/{channelId}")
+    public void exitChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+        //TODO: implement
     }
 }
