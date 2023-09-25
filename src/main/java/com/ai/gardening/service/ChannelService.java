@@ -1,6 +1,6 @@
 package com.ai.gardening.service;
 
-import com.ai.gardening.dtos.*;
+import com.ai.gardening.dto.*;
 import com.ai.gardening.entity.AppUser;
 import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Token;
@@ -36,6 +36,11 @@ public class ChannelService {
      */
     public ResponseEntity<ChannelResponse> createChannel(CreateChannelRequest createChannelRequest, String token) {
         AppUser appUser = appUserService.findCurrentAppUser(token);
+
+        if (createChannelRequest.getName() == null) {
+            LOGGER.info("The channel was not created because the name is null.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ChannelResponse(createChannelRequest.getName()));
+        }
 
         if (findChannelByName(createChannelRequest.getName()).getId() == null && appUser.getId() != null) {
 
@@ -245,6 +250,17 @@ public class ChannelService {
     }
 
     /**
+     *
+     * @param appUser
+     * @return true if the user has joined the channel & false if not
+     */
+    public boolean findChannelByJoinedAppUser(AppUser appUser) {
+        List<Channel> channel = channelRepository.findAllByJoinedAppUsers(appUser);
+
+        return !channel.isEmpty();
+    }
+
+    /**
      * Checks if a user is the owner of a channel, based on the authentication token that is received at every request
      * The method do not check specifically for channels, but its private access restricts its use for channels only
      *
@@ -261,7 +277,7 @@ public class ChannelService {
             return true;
         }
 
-        LOGGER.info("User with id {} is the admin of this post.", appUser.getId());
+        LOGGER.info("User with id {} is not the admin of this post.", appUser.getId());
         return false;
     }
 }
