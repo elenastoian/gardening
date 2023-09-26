@@ -6,6 +6,7 @@ import com.ai.gardening.entity.Channel;
 import com.ai.gardening.entity.Token;
 import com.ai.gardening.repository.AppUserRepository;
 import com.ai.gardening.repository.ChannelRepository;
+import com.ai.gardening.repository.PostRepository;
 import com.ai.gardening.service.security.TokenService;
 import lombok.AllArgsConstructor;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ public class ChannelService {
     private final AppUserRepository appUserRepository;
     private final AppUserService appUserService;
     private final TokenService tokenService;
+    private final PostRepository postRepository;
 
     /**
      * Creates a new channel after checking 3 conditions: the name can not be null or used and the app user has to exist
@@ -61,7 +63,7 @@ public class ChannelService {
         List<AllChannelsResponse> response = new ArrayList<>();
 
         channels.forEach(channel -> {
-            List<AppUser> joinedUsers = channel.getJoinedAppUsers(); // Replace this with the actual method to get joined users for a channel
+            List<AppUser> joinedUsers = channel.getJoinedAppUsers();
 
             List<AppUserResponse> joinedAppUsers = new ArrayList<>();
             joinedUsers.forEach(joinedUser -> {
@@ -279,5 +281,38 @@ public class ChannelService {
 
         LOGGER.info("User with id {} is not the admin of this post.", appUser.getId());
         return false;
+    }
+
+    public ResponseEntity<List<Long>> findChannelIdsByUserId(String token) {
+       AppUser appUser = appUserService.findCurrentAppUser(token);
+
+       if(appUser.getId() == null) {
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.emptyList());
+       }
+       List<Long> channelIds = channelRepository.findChannelIdsByUserId(appUser.getId());
+
+        return ResponseEntity.status(HttpStatus.OK).body(channelIds);
+    }
+
+    public ResponseEntity<GetChannelResponse> getChannel(long channelId, String token) {
+        Optional<Channel> channel = channelRepository.findById(channelId);
+
+        if (channel.isPresent()) {
+            List<Long> joinedAppUsers = findChannelIdsByUserId(token).getBody();
+            List<Long> postsIds = postRepository.findAllPostIdsByChannelId(channelId);
+
+            GetChannelResponse channelResponse = GetChannelResponse.builder()
+                    .id(channelId)
+                    .channelName(channel.get().getName())
+                    .ownerId(channel.get().getOwner().getId())
+                    .joinedAppUsersIds(joinedAppUsers)
+                    .postsIds(postsIds)
+                    .build();
+
+            return ResponseEntity.status(HttpStatus.OK).body(channelResponse);
+        }
+
+        LOGGER.info("Channel was not found by id.");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new GetChannelResponse());
     }
 }

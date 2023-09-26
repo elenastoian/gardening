@@ -1,9 +1,6 @@
 package com.ai.gardening.controller;
 
-import com.ai.gardening.dto.ChannelResponse;
-import com.ai.gardening.dto.CreateChannelRequest;
-import com.ai.gardening.dto.UpdateChannelRequest;
-import com.ai.gardening.dto.AllChannelsResponse;
+import com.ai.gardening.dto.*;
 import com.ai.gardening.service.ChannelService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -34,14 +31,20 @@ public class ChannelController {
         return channelService.findAllOwnedChannels(token);
     }
 
-    @GetMapping(path = "/joined")
+    @GetMapping(path = "/all-joined-channels")
     public ResponseEntity<List<ChannelResponse>> getAllJoinedChannels(@RequestHeader("Authorization") String token) {
         return channelService.findAllJoinedChannels(token);
     }
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<String> getChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
-        return null; //TODO: to be implemented
+    /**
+     * Returns information about only one channel, based on channel's id
+     * @param channelId the identification criteria for the channel
+     * @param token app user's authentication token used to verify that an user is authenticated
+     * @return a DTO that contains the information about the channel
+     */
+    @GetMapping(path = "/{channelId}")
+    public ResponseEntity<GetChannelResponse> getChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+        return channelService.getChannel(channelId, token);
     }
 
     @PutMapping(path = "/update")
@@ -59,8 +62,13 @@ public class ChannelController {
         return channelService.joinChannel(channelId, token);
     }
 
-    @PostMapping(path = "/join/{channelId}")
-    public void exitChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
-        //TODO: implement
+//    @PostMapping(path = "/join/{channelId}")
+//    public void exitChannel(@PathVariable("channelId") long channelId, @RequestHeader("Authorization") String token) {
+//        //TODO: implement
+//    }
+
+    @GetMapping(path = "/joined-channels") //TODO: find a better path
+    public ResponseEntity<List<Long>> findChannelIdsByUserId(@RequestHeader("Authorization") String token) {
+        return channelService.findChannelIdsByUserId(token);
     }
 }
