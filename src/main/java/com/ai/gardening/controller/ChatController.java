@@ -23,14 +23,15 @@ public class ChatController {
     @PostMapping("/chat")
     public String chat(@RequestBody String prompt) {
 
-        ChatRequest request = new ChatRequest(model, prompt);
-
-        ChatResponse response = restTemplate.postForObject(apiUrl, request, ChatResponse.class);
-
-        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
-            return "No response";
-        }
-
-        return response.getChoices().get(0).getMessage().getContent();
+//        ChatRequest request = new ChatRequest(model, prompt);
+//
+//        ChatResponse response = restTemplate.postForObject(apiUrl, request, ChatResponse.class);
+//
+//        if (response == null || response.getChoices() == null || response.getChoices().isEmpty()) {
+//            return "No response";
+//        }
+//
+//        return response.getChoices().get(0).getMessage().getContent();
+        return "";
     }
 }
